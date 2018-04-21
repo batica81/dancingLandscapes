@@ -1,0 +1,1 @@
+Testing for different node application startup modes.

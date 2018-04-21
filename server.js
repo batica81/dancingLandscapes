@@ -1,38 +1,35 @@
 
 // server.js
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const router = jsonServer.router('db.json')
-const middlewares = jsonServer.defaults()
+const jsonServer = require('json-server');
+const server = jsonServer.create();
+const router = jsonServer.router('db.json');
+const middlewares = jsonServer.defaults();
 const opn = require('opn');
 
-server.use(middlewares)
-server.use(router)
+server.use(middlewares);
+server.use(router);
 server.listen(3000, () => {
-  console.log('JSON Server is running')
-})
+  console.log('JSON Server is running on port 3000');
+});
 
 
 
 
-// var app = require('express')();
-var app = server;
+var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // app.get('/', function(req, res){
-//   res.sendFile(__dirname + '/index.html');
+//   res.sendFile(__dirname + '/public/index.html');
 // });
 
 io.on('connection', function(socket){
   console.log('a user connected');
 });
 
-// http.listen(3000, function(){
-//   console.log('listening on *:3000');
+// http.listen(3001, function(){
+//   console.log('listening on *:3001');
 // });
-
-
 
 
 
@@ -79,4 +76,8 @@ function setCurrentProduct(arg) {
 
 
 // Opens the url in the default browser
-opn('http://127.0.0.1:3000');
+// Linux:
+// opn('http://127.0.0.1:3000', {app: ['google-chrome', '--incognito']});
+// Windows:
+opn('http://127.0.0.1:3000', {app: ['chrome']});
+
