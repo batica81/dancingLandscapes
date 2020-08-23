@@ -9,9 +9,9 @@ const opn = require('opn');
 
 app.use(express.static('./'));
 
-http.listen(3000, () => console.log('Example app listening on port 3000!'));
+http.listen(3005, () => console.log('Example app listening on port 3005!'));
 
-opn('http://127.0.0.1:3000', {app: ['chrome']});
+opn('http://127.0.0.1:3005', {app: ['chrome']});
 
 
 /////////// Serial server
@@ -19,9 +19,10 @@ opn('http://127.0.0.1:3000', {app: ['chrome']});
 const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
 
-const port = new SerialPort('COM3', {
+const port = new SerialPort('COM5', {
 // const port = new SerialPort('/dev/ttyUSB0', {
-        baudRate: 115200
+//         baudRate: 115200
+        baudRate: 57600
     },
     function (err) {
         if (err) {
@@ -37,13 +38,13 @@ port.pipe(parser);
 // parser.on('data', console.log);
 parser.on('data', setCurrentProduct);
 
-let currentProduct = "";
+let currentProduct = 0;
 
 function setCurrentProduct(arg) {
     currentProduct = arg;
 
-    if (currentProduct.substr(0, 5) === 'Paylo') {
-        io.emit('chat message', currentProduct);
-    }
+    // if (currentProduct.substr(0, 5) === 'Paylo') {
+        io.emit('msg', currentProduct);
+    // }
     //     io.removeAllListeners();
 }

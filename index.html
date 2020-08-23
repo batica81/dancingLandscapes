@@ -1,45 +1,154 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<title>socket.io serial</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="/public/favicon.ico"/>
     <script  src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="assets/jquery-3.3.1.min.js"></script>
-    <script src="test.js"></script>
+    <script src="gauge.min.js"></script>
+    <script src="fe.js"></script>
+
 
     <style>
 
-        .indicator {
-            height: 200px;
-            width: 200px;
+        body {
+            background-color: azure;
         }
+
+        .indicator {
+            height: 50px;
+            width: 50px;
+        }
+
+
+        .green {
+            background-color: greenyellow;
+        }
+
 
         .red {
             background-color: rebeccapurple;
         }
 
-        .green {
-            background-color: greenyellow;
+        .result, .average {
+            text-align: center;
+            font-size: 12vh;
         }
+
+        #foo  {
+            padding: 0;
+            margin: auto;
+            display: block;
+            width: 600px;
+        }
+
+        .reset {
+            padding: 0;
+            margin: auto;
+            display: block;
+            font-size: 3vh;
+        }
+
     </style>
 </head>
 <body>
 
 
+<h3>Receive test</h3>
 
-<h3>test 2</h3>
+<div class="indicator red green"></div>
 
-<div class="indicator red"></div>
+<canvas id="foo"></canvas>
+
+<div class="result">0</div>
+<br>
+<button class="reset">Reset</button>
+<br>
+<div class="average">0</div>
 
 <ol id="messages"></ol>
 
 <script>
-  var socket = io();
+    var allvalues = [];
 
-      socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
-      $('.indicator').toggleClass('red').toggleClass('green');
+    let socket = io();
+    let el = document.getElementsByClassName('indicator')[0];
+    let result = document.getElementsByClassName('result')[0];
+    let reset = document.getElementsByClassName('reset')[0];
+    let average = document.getElementsByClassName('average')[0];
+    let messages = document.getElementById('messages');
+
+    reset.addEventListener('click', function (){
+        result.innerText = 0;
+        average.innerText = 0;
+        allvalues = []
+        gauge.set(0);
+        messages.innerHTML = "";
     });
+
+    socket.on('msg', function(msg){
+        let li = document.createElement('li');
+        allvalues.push(parseFloat(msg));
+        li.innerText = msg;
+        gauge.set(msg);
+        result.innerText = msg.replace(',', ' V');
+        document.getElementById('messages').append(li);
+        el.classList.toggle('red');
+    });
+
+    setInterval(function () {
+        if (allvalues.length !== 0) {
+            let values = allvalues;
+            let sum = values.reduce((previous, current) => current += previous);
+            let avg = sum / values.length;
+            average.innerText = "Avg: " + avg.toFixed(2) + " V";
+        }
+    }, 500)
+
+
+
+    // gauge setup
+    var opts = {
+        angle: 0.1, // The span of the gauge arc
+        lineWidth: 0.3, // The line thickness
+        radiusScale: 1, // Relative radius
+        pointer: {
+            length: 0.6, // // Relative to gauge radius
+            strokeWidth: 0.035, // The thickness
+            color: '#000000' // Fill color
+        },
+        limitMax: false,     // If false, max value increases automatically if value > maxValue
+        limitMin: false,     // If true, the min value of the gauge will be fixed
+        colorStart: '#6F6EA0',   // Colors
+        colorStop: '#C0C0DB',    // just experiment with them
+        strokeColor: '#EEEEEE',  // to see which ones work best for you
+        generateGradient: true,
+        highDpiSupport: true,     // High resolution support
+        percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]],
+        staticLabels: {
+            font: "10px sans-serif",  // Specifies font
+            labels: [10, 13, 15, 22.1, 26, 30],  // Print labels at these values
+            color: "#000000",  // Optional: Label text color
+            fractionDigits: 0  // Optional: Numerical precision. 0=round off.
+        },
+        staticZones: [
+            {strokeStyle: "#3eccf0", min: 0, max: 10}, // Red from 100 to 130
+            {strokeStyle: "#F03E3E", min: 10, max: 13}, // Red from 100 to 130
+            {strokeStyle: "#FFDD00", min: 13, max: 15}, // Yellow
+            {strokeStyle: "#30B32D", min: 15, max: 22}, // Green
+            {strokeStyle: "#FFDD00", min: 22, max: 26}, // Yellow
+            {strokeStyle: "#F03E3E", min: 26, max: 30}  // Red
+        ],
+
+    };
+    var target = document.getElementById('foo'); // your canvas element
+    var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+    gauge.maxValue = 30; // set max gauge value
+    gauge.setMinValue(0);  // Prefer setter over gauge.minValue = 0
+    gauge.animationSpeed = 32; // set animation speed (32 is default value)
+    gauge.set(1); // set actual value
+
 </script>
 
 </body>

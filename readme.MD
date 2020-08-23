@@ -3,3 +3,6 @@ Testing different node (express) application startup modes with:
 * json-server backend
 * serial port support
 
+Requires node 10 on windows!
+
+index.js runs serial server

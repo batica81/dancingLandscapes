@@ -8,8 +8,8 @@ const opn = require('opn');
 
 server.use(middlewares);
 server.use(router);
-server.listen(3000, () => {
-  console.log('JSON Server is running on port 3000');
+server.listen(3004, () => {
+  console.log('JSON Server is running on port 3004');
 });
 
 
@@ -39,9 +39,10 @@ const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
 
 
-// const port = new SerialPort('COM3', {
-const port = new SerialPort('/dev/ttyUSB0', {
-  	baudRate: 9600
+const port = new SerialPort('COM5', {
+// const port = new SerialPort('/dev/ttyUSB0', {
+//   	baudRate: 9600
+  	baudRate: 57600
 },
 function (err) {
   if (err) {
@@ -79,5 +80,5 @@ function setCurrentProduct(arg) {
 // Linux:
 // opn('http://127.0.0.1:3000', {app: ['google-chrome', '--incognito']});
 // Windows:
-opn('http://127.0.0.1:3000', {app: ['chrome']});
+opn('http://127.0.0.1:3004', {app: ['chrome']});
 
